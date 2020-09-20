@@ -16,14 +16,12 @@ public class Customer {
      * @return true if account hasn't already created, otherwise returns false and prints "Customer fullName() already has the active account"
      */
     public boolean openAccount(long accountId) {
-        if(account == null){
+        if (account == null) {
             account = new Account(accountId);
             return true;
         }
-        else{
-            System.out.printf("Customer %s already has the active account", fullName());
-            return false;
-        }
+        System.out.printf("Customer %s already has the active account", fullName());
+        return false;
     }
 
     /**
@@ -32,18 +30,17 @@ public class Customer {
      * @return false if account is already null and prints "Customer fullName() has no active account to close", otherwise sets account to null and returns true
      */
     public boolean closeAccount() {
-        if(account == null){
+        if (account == null) {
             System.out.printf("Customer %s has no active account to close", fullName());
             return false;
         }
-        else{
-            account = null;
-            return true;
-        }
+        account = null;
+        return true;
     }
 
     /**
      * Formatted full name of the customer
+     *
      * @return concatenated form of name and lastName, e.g. "John Goodman"
      */
     public String fullName() {
@@ -52,31 +49,29 @@ public class Customer {
 
     /**
      * Delegates withdraw to Account class
+     *
      * @param amount
      * @return false if account is null and prints "Customer fullName() has no active account", otherwise returns the result of Account's withdraw method
      */
     public boolean withdrawFromCurrentAccount(double amount) {
-        if(account == null){
+        if (account == null) {
             System.out.printf("Customer %s has no active account", fullName());
             return false;
         }
-        else{
-            return account.withdraw(amount);
-        }
+        return account.withdraw(amount);
     }
 
     /**
      * Delegates adding money to Account class
+     *
      * @param amount
      * @return false if account is null and prints "Customer fullName() has no active account", otherwise returns the result of Account's add method
      */
     public boolean addMoneyToCurrentAccount(double amount) {
-        if(account == null){
+        if (account == null) {
             System.out.printf("Customer %s has no active account", fullName());
             return false;
         }
-        else{
-            return account.add(amount);
-        }
+        return account.add(amount);
     }
 }
