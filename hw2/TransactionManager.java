@@ -3,6 +3,7 @@ package ru.sbt.mipt.hw2;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Manages all transactions within the application
@@ -16,16 +17,14 @@ public class TransactionManager {
      * @param beneficiary
      * @return created Transaction
      */
+    private final HashMap<Account, ArrayList<Transaction>> accountsHistory = new HashMap<>();
+
     public Transaction createTransaction(double amount, Account originator, Account beneficiary) {
         return new Transaction(amount, originator, beneficiary, false, false);
     }
 
     public Collection<Transaction> findAllTransactionsByAccount(Account account) {
-        ArrayList<Transaction> toReturn = new ArrayList<Transaction>();
-        for (Entry entry : account.history(LocalDateTime.MIN, LocalDateTime.MAX)) {
-            toReturn.add(entry.getTransaction());
-        }
-        return toReturn;
+        return accountsHistory.get(account);
     }
 
     Collection<Transaction> findAllPurchasesByAccount(Account account) {
@@ -41,10 +40,27 @@ public class TransactionManager {
     }
 
     public void rollbackTransaction(Transaction transaction) {
-        transaction.rollback();
+        Transaction new_transaction = transaction.rollback();
+        addToAccountsHistory(new_transaction);
     }
 
     public void executeTransaction(Transaction transaction) {
-        transaction.execute();
+        Transaction new_transaction = transaction.execute();
+        addToAccountsHistory(new_transaction);
+    }
+
+    private void addToAccountsHistory(Transaction transaction) {
+        ArrayList<Transaction> listOfTransactionsOriginator = accountsHistory.get(transaction.getOriginator());
+        if (listOfTransactionsOriginator == null) {
+            listOfTransactionsOriginator = new ArrayList<Transaction>();
+        }
+        listOfTransactionsOriginator.add(transaction);
+        accountsHistory.put(transaction.getOriginator(), listOfTransactionsOriginator);
+        ArrayList<Transaction> listOfTransactionsBeneficiary = accountsHistory.get(transaction.getBeneficiary());
+        if (listOfTransactionsBeneficiary == null) {
+            listOfTransactionsBeneficiary = new ArrayList<Transaction>();
+        }
+        listOfTransactionsBeneficiary.add(transaction);
+        accountsHistory.put(transaction.getBeneficiary(), listOfTransactionsBeneficiary);
     }
 }
