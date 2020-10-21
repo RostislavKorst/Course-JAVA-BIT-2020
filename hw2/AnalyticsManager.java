@@ -1,6 +1,5 @@
 package ru.sbt.mipt.hw2;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class AnalyticsManager {
@@ -12,7 +11,7 @@ public class AnalyticsManager {
 
     public Account mostFrequentBeneficiaryOfAccount(Account account) {
         Collection<Transaction> elements = transactionManager.findAllTransactionsByAccount(account);
-        HashMap<Account, Integer> frequencyMap = new HashMap<Account, Integer>();
+        Map<Account, Integer> frequencyMap = new HashMap<>();
         for (Transaction element : elements) {
             Account beneficiary = element.getBeneficiary();
             if (beneficiary != null && beneficiary != account) {
@@ -25,18 +24,17 @@ public class AnalyticsManager {
 
     public Collection<Transaction> topTenExpensivePurchases(Account account) {
         Collection<Transaction> elements = transactionManager.findAllPurchasesByAccount(account);
-        PriorityQueue<Transaction> queue = new PriorityQueue<Transaction>(Collections.reverseOrder());
+        Queue<Transaction> queue = new PriorityQueue<>(Comparator.comparingDouble(Transaction::getAmount).reversed());
         queue.addAll(elements);
-        int i = 0;
-        ArrayList<Transaction> toReturn = new ArrayList<Transaction>(10);
-        while (i++ < 10) {
+        List<Transaction> topTenTransactions = new ArrayList<>(10);
+        for (int i = 0; i < 10; i++) {
             Transaction transaction = queue.poll();
             if (transaction != null) {
-                toReturn.add(transaction);
+                topTenTransactions.add(transaction);
             } else {
                 break;
             }
         }
-        return toReturn;
+        return topTenTransactions;
     }
 }

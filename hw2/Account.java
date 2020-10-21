@@ -91,7 +91,7 @@ public class Account {
         entries.addEntry(entry);
     }
 
-    public Collection<Entry> history(LocalDateTime from, LocalDateTime to) throws IllegalArgumentException {
+    public Collection<Entry> history(LocalDateTime from, LocalDateTime to) {
         return entries.betweenDates(from, to);
     }
 
@@ -102,11 +102,11 @@ public class Account {
      * @return balance
      */
     public double balanceOn(LocalDateTime date) {
-        double toReturn = 0;
-        for (Entry entry : entries.betweenDates(LocalDateTime.MIN, date)) {
-            toReturn += entry.getAmount();
+        double balance = 0;
+        for (Entry entry : entries.upTo(date)) {
+            balance += entry.getAmount();
         }
-        return toReturn;
+        return balance;
     }
 
     /**
@@ -118,10 +118,10 @@ public class Account {
     }
 
     public double currentBalance() {
-        double toReturn = 0;
-        for (Entry entry : entries.betweenDates(LocalDateTime.MIN, LocalDateTime.MAX)) {
-            toReturn += entry.getAmount();
-        }
-        return toReturn;
+        return balanceOn(LocalDateTime.now());
+    }
+
+    public Entry lastEntry() {
+        return entries.last();
     }
 }

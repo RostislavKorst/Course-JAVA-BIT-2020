@@ -1,156 +1,106 @@
 package ru.sbt.mipt.hw2;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 public class EntriesTest {
+    private Entries entries;
+    private Collection<Entry> expectedEntries;
+    private Collection<Entry> expectedEntriesBetweenDates;
+    private LocalDateTime testTime;
+
+    @Before
+    public void createEntries() {
+        entries = new Entries();
+        Account account = new Account(new TransactionManager());
+        Account account1 = new Account(new TransactionManager());
+        Entry firstEntry0minutes0seconds = new Entry(account, new Transaction(0, 0, account, account1,
+                false, false), 0,
+                LocalDateTime.now());
+        entries.addEntry(firstEntry0minutes0seconds);
+        testTime = LocalDateTime.now().plusMinutes(5);
+        Entry secondEntry5minutes = new Entry(account, new Transaction(0, 0, account, account1,
+                false, false), 0,
+                testTime);
+        entries.addEntry(secondEntry5minutes);
+        Entry thirdEntry10minutes = new Entry(account, new Transaction(0, 0, account, account1,
+                false, false), 0,
+                LocalDateTime.now().plusMinutes(10));
+        entries.addEntry(thirdEntry10minutes);
+        Entry fourthEntry15minutes = new Entry(account, new Transaction(0, 0, account, account1,
+                false, false), 0,
+                LocalDateTime.now().plusMinutes(15));
+        entries.addEntry(fourthEntry15minutes);
+        Entry fifthEntry20minutes = new Entry(null, new Transaction(0, 0, account, account1,
+                false, false), 0,
+                LocalDateTime.now().plusMinutes(20));
+        entries.addEntry(fifthEntry20minutes);
+
+        expectedEntries = new TreeSet<>(List.of(secondEntry5minutes,
+                thirdEntry10minutes,
+                fourthEntry15minutes, fifthEntry20minutes));
+        expectedEntriesBetweenDates = new TreeSet<>(List.of(secondEntry5minutes,
+                thirdEntry10minutes,
+                fourthEntry15minutes));
+    }
+
     @Test
     public void fromTest_TimeIsNotFromCollection_ReturnsCollectionOfEntries() {
         //given
-        Entries entries = new Entries();
-        Entry firstEntry0minutes0seconds = new Entry(null, null, 0,
-                LocalDateTime.now());
-        entries.addEntry(firstEntry0minutes0seconds);
-        Entry secondEntry5minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(5));
-        entries.addEntry(secondEntry5minutes);
-        Entry thirdEntry10minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(10));
-        entries.addEntry(thirdEntry10minutes);
-        Entry fourthEntry15minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(15));
-        entries.addEntry(fourthEntry15minutes);
         LocalDateTime entryBetweenFirstAndSecond = LocalDateTime.now().plusMinutes(3);
         //when
         Collection<Entry> returnedArray = entries.from(entryBetweenFirstAndSecond);
         //then
-        Collection<Entry> correctSubCollection = Arrays.asList(secondEntry5minutes, thirdEntry10minutes,
-                fourthEntry15minutes);
-        assertEquals(correctSubCollection, returnedArray);
+        assertEquals(expectedEntries, returnedArray);
     }
 
     @Test
     public void fromTest_TimeIsFromCollection_ReturnsCollectionOfEntries() {
         //given
-        Entries entries = new Entries();
-        Transaction firstTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry firstEntry0minutes0seconds = new Entry(null, firstTransaction, 0,
-                LocalDateTime.now());
-        entries.addEntry(firstEntry0minutes0seconds);
-        LocalDateTime secondTime = LocalDateTime.now().plusMinutes(5);
-        Transaction secondTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry secondEntry5minutes = new Entry(null, secondTransaction, 0,
-                secondTime);
-        entries.addEntry(secondEntry5minutes);
-        Transaction thirdTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry thirdEntry10minutes = new Entry(null, thirdTransaction, 0,
-                LocalDateTime.now().plusMinutes(10));
-        entries.addEntry(thirdEntry10minutes);
-        Transaction fourthTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry fourthEntry15minutes = new Entry(null, fourthTransaction, 0,
-                LocalDateTime.now().plusMinutes(15));
-        entries.addEntry(fourthEntry15minutes);
+        LocalDateTime secondTime = testTime;
         //when
         Collection<Entry> returnedArray = entries.from(secondTime);
         //then
-        Collection<Entry> correctSubCollection = Arrays.asList(secondEntry5minutes, thirdEntry10minutes,
-                fourthEntry15minutes);
-        assertEquals(correctSubCollection, returnedArray);
+        assertEquals(expectedEntries, returnedArray);
     }
 
     @Test
     public void betweenDates_TimeIsNotFromCollection_ReturnsCollectionOfEntries() {
         //given
-        Entries entries = new Entries();
-        Entry firstEntry0minutes0seconds = new Entry(null, null, 0,
-                LocalDateTime.now());
-        entries.addEntry(firstEntry0minutes0seconds);
-        Entry secondEntry5minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(5));
-        entries.addEntry(secondEntry5minutes);
-        Entry thirdEntry10minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(10));
-        entries.addEntry(thirdEntry10minutes);
-        Entry fourthEntry15minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(15));
-        entries.addEntry(fourthEntry15minutes);
-        Entry fifthEntry20minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(20));
-        entries.addEntry(fifthEntry20minutes);
         LocalDateTime timeBetweenFirstAndSecond = LocalDateTime.now().plusMinutes(3);
         LocalDateTime timeBetweenFourthAndFifth = LocalDateTime.now().plusMinutes(18);
         //when
         Collection<Entry> returnedArray = entries.betweenDates(timeBetweenFirstAndSecond, timeBetweenFourthAndFifth);
         //then
-        Collection<Entry> correctSubCollection = Arrays.asList(secondEntry5minutes, thirdEntry10minutes,
-                fourthEntry15minutes);
-        assertEquals(correctSubCollection, returnedArray);
+        assertEquals(expectedEntriesBetweenDates, returnedArray);
     }
 
     @Test
-    public void betweenDates_ToTimeIsFromCollection_ReturnsCollectionOfEntries() {
+    public void betweenDates_TimeIsFromCollection_ReturnsCollectionOfEntries() {
         //given
-        Entries entries = new Entries();
-        Transaction firstTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry firstEntry0minutes0seconds = new Entry(null, firstTransaction, 0,
-                LocalDateTime.now());
-        entries.addEntry(firstEntry0minutes0seconds);
-        LocalDateTime secondTime = LocalDateTime.now().plusMinutes(5);
-        Transaction secondTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry secondEntry5minutes = new Entry(null, secondTransaction, 0,
-                secondTime);
-        entries.addEntry(secondEntry5minutes);
-        Transaction thirdTransaction = new Transaction(1, null, null,
-                false, false);
-        Entry thirdEntry10minutes = new Entry(null, thirdTransaction, 0,
-                LocalDateTime.now().plusMinutes(10));
-        entries.addEntry(thirdEntry10minutes);
-        Transaction fourthTransaction = new Transaction(1, null, null,
-                false, false);
-        LocalDateTime fourthTime = LocalDateTime.now().plusMinutes(15);
-        Entry fourthEntry15minutes = new Entry(null, fourthTransaction, 0,
-                fourthTime);
-        entries.addEntry(fourthEntry15minutes);
-        LocalDateTime timeBetweenFirstAndSecond = LocalDateTime.now().plusMinutes(3);
+        LocalDateTime timeBetweenFourthAndFifth = LocalDateTime.now().plusMinutes(18);
         //when
-        Collection<Entry> returnedArray = entries.betweenDates(timeBetweenFirstAndSecond, fourthTime);
+        Collection<Entry> returnedArray = entries.betweenDates(testTime, timeBetweenFourthAndFifth);
         //then
-        Collection<Entry> correctSubCollection = Arrays.asList(secondEntry5minutes, thirdEntry10minutes);
-        assertEquals(correctSubCollection, returnedArray);
+        assertEquals(expectedEntriesBetweenDates, returnedArray);
     }
 
     @Test
     public void last() {
         //given
-        Entries entries = new Entries();
-        Entry firstEntry0minutes0seconds = new Entry(null, null, 0,
-                LocalDateTime.now());
-        entries.addEntry(firstEntry0minutes0seconds);
-        Entry secondEntry5minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(5));
-        entries.addEntry(secondEntry5minutes);
-        Entry thirdEntry10minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(10));
-        entries.addEntry(thirdEntry10minutes);
-        Entry fourthEntry15minutes = new Entry(null, null, 0,
-                LocalDateTime.now().plusMinutes(15));
-        entries.addEntry(fourthEntry15minutes);
-        LocalDateTime entryBetweenFirstAndSecond = LocalDateTime.now().plusMinutes(3);
+        Transaction firstTransaction = new Transaction(1, null, null,
+                false, false);
+        Entry expectedLastEntry = new Entry(null, firstTransaction, 0,
+                LocalDateTime.now().plusMinutes(30));
+        entries.addEntry(expectedLastEntry);
         //when
         Entry returnedEntry = entries.last();
         //then
-        assertEquals(fourthEntry15minutes, returnedEntry);
+        assertEquals(expectedLastEntry, returnedEntry);
     }
 }

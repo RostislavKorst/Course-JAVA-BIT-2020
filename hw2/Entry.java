@@ -33,26 +33,25 @@ public class Entry implements Comparable<Entry> {
     }
 
     @Override
-    public int compareTo(Entry o) {
-        if (this.time.compareTo(o.time) == 0) {
-            return (this.transaction.getId() > o.transaction.getId()) ? -1 : 1; //the lower id - the bigger entry
+    public int compareTo(Entry entry) {
+        if (this.time.compareTo(entry.time) == 0) {
+            return this.transaction.compareTo(entry.transaction);
         }
-        return this.time.compareTo(o.time);
+        return this.time.compareTo(entry.time);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Entry entry = (Entry) o;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Entry entry = (Entry) object;
         return Double.compare(entry.amount, amount) == 0 &&
                 account.equals(entry.account) &&
-                transaction.equals(entry.transaction) &&
                 time.equals(entry.time);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(account, transaction, amount, time);
+        return Objects.hash(account, amount, time);
     }
 }

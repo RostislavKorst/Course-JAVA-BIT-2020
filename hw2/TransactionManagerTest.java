@@ -1,89 +1,91 @@
 package ru.sbt.mipt.hw2;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
 
 public class TransactionManagerTest {
+    private TransactionManager transactionManager;
+    private Account account1;
+    private Account account2;
+
+    @Before
+    public void createAccounts() {
+        transactionManager = new TransactionManager();
+        account1 = new Account(transactionManager);
+        account2 = new Account(transactionManager);
+    }
+
     @Test
     public void createTransaction_ReturnsTransaction() {
-        //given
-        TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(transactionManager);
-        Account beneficiary = new Account(transactionManager);
         //when
-        Transaction expectedTransaction = new Transaction(2000, originator, beneficiary, false, false);
-        Transaction actualTransaction = transactionManager.createTransaction(2000, originator, beneficiary);
+        Transaction actualTransaction = transactionManager.createTransaction(2000, account1, account2);
+        Transaction expectedTransaction = new Transaction(actualTransaction.getId(), 2000, account1,
+                account2, false, false);
         //then
         assertEquals(expectedTransaction, actualTransaction);
+    }
+
+    private void executeSomeTransactions() {
+        account2.add(200, account1);
+        account2.addCash(300);
+        account2.withdrawCash(45);
+    }
+
+    private Collection<Transaction> getExpectedTransactions() {
+        Transaction transaction1 = new Transaction(1, 200, account1, account2,
+                true, false);
+        Transaction transaction2 = new Transaction(2, 300, null, account2,
+                true, false);
+        Transaction transaction3 = new Transaction(3, 45, account2, null,
+                true, false);
+        return Arrays.asList(transaction1, transaction2, transaction3);
     }
 
     @Test
     public void findAllTransactionsByAccount_ReturnsCollectionOfTransactions() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(transactionManager);
-        Account beneficiary = new Account(transactionManager);
+        executeSomeTransactions();
+        Collection<Transaction> expectedListOfTransactions = getExpectedTransactions();
         //when
-        beneficiary.add(200, originator);
-        beneficiary.addCash(300);
-        beneficiary.withdrawCash(45);
-        Transaction transaction1 = new Transaction(200, originator, beneficiary, true, false);
-        Transaction transaction2 = new Transaction(300, null, beneficiary, true, false);
-        Transaction transaction3 = new Transaction(45, beneficiary, null, true, false);
-        Collection<Transaction> expectedListOfTransactions = Arrays.asList(transaction1, transaction2, transaction3);
-        Collection<Transaction> actualListOfTransactions = transactionManager.findAllTransactionsByAccount(beneficiary);
+        Collection<Transaction> actualListOfTransactions = transactionManager.findAllTransactionsByAccount(account2);
         //then
         assertEquals(expectedListOfTransactions, actualListOfTransactions);
     }
 
     @Test
-    public void rollbackTransaction_AddsToTheHistory() {
+    public void rollbackTransaction_AddsEntryToTheHistory() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(transactionManager);
-        Account beneficiary = new Account(transactionManager);
         double amount = 2000;
-        Transaction transaction = new Transaction(amount, originator, beneficiary, false, false);
-        Transaction transactionTrueExecuted = new Transaction(amount, originator, beneficiary,
-                true, false);
-        Transaction transactionTrueRolledBack = new Transaction(amount, originator, beneficiary,
+        Transaction transaction = new Transaction(amount, account1, account2, false, false);
+        Transaction transactionTrueRolledBack = new Transaction(amount, account1, account2,
                 true, true);
-        //when
         transactionManager.executeTransaction(transaction);
+        //when
         transactionManager.rollbackTransaction(transaction);
-        Collection<Entry> originatorHistory = originator.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Collection<Entry> expectedOriginatorHistory = new ArrayList<>();
-        expectedOriginatorHistory.add(new Entry(originator, transactionTrueExecuted, -amount,
-                ((ArrayList<Entry>)originatorHistory).get(0).getTime()));
-        expectedOriginatorHistory.add(new Entry(originator, transactionTrueRolledBack, amount,
-                ((ArrayList<Entry>)originatorHistory).get(1).getTime()));
+        Entry expectedEntry = new Entry(account1, transactionTrueRolledBack, amount, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
         //then
-        assertEquals(expectedOriginatorHistory, originatorHistory);
+        assertEquals(expectedEntry, actualEntry);
     }
 
     @Test
     public void executeTransaction_AddsToTheHistory() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(transactionManager);
-        Account beneficiary = new Account(transactionManager);
         double amount = 2000;
-        Transaction transaction = new Transaction(amount, originator, beneficiary, false, false);
-        Transaction transactionTrueExecuted = new Transaction(amount, originator, beneficiary,
+        Transaction transaction = new Transaction(amount, account1, account2, false, false);
+        Transaction transactionTrueExecuted = new Transaction(amount, account1, account2,
                 true, false);
         //when
         transactionManager.executeTransaction(transaction);
-        Collection<Entry> originatorHistory = originator.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Collection<Entry> expectedOriginatorHistory = new ArrayList<>();
-        expectedOriginatorHistory.add(new Entry(originator, transactionTrueExecuted, -amount,
-                ((ArrayList<Entry>)originatorHistory).get(0).getTime()));
+        Entry expectedEntry = new Entry(account1, transactionTrueExecuted, -amount, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
         //then
-        assertEquals(expectedOriginatorHistory, originatorHistory);
+        assertEquals(expectedEntry, actualEntry);
     }
 }
