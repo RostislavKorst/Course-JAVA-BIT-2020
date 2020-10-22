@@ -1,8 +1,6 @@
 package ru.sbt.mipt.hw3;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Manages all transactions within the application
@@ -16,7 +14,7 @@ public class TransactionManager {
      * @param beneficiary
      * @return created Transaction
      */
-    private final HashMap<DebitCard, ArrayList<Transaction>> accountsHistory = new HashMap<>();
+    private final Map<DebitCard, List<Transaction>> accountsHistory = new HashMap<>();
 
     public Transaction createTransaction(double amount, DebitCard originator, DebitCard beneficiary) {
         return new Transaction(amount, originator, beneficiary, false, false);
@@ -44,18 +42,18 @@ public class TransactionManager {
     }
 
     public void executeTransaction(Transaction transaction) {
-        Transaction new_transaction = transaction.execute();
-        addToAccountsHistory(new_transaction);
+        Transaction newTransaction = transaction.execute();
+        addToAccountsHistory(newTransaction);
     }
 
     private void addToAccountsHistory(Transaction transaction) {
-        ArrayList<Transaction> listOfTransactionsOriginator = accountsHistory.get(transaction.getOriginator());
+        List<Transaction> listOfTransactionsOriginator = accountsHistory.get(transaction.getOriginator());
         if (listOfTransactionsOriginator == null) {
             listOfTransactionsOriginator = new ArrayList<>();
         }
         listOfTransactionsOriginator.add(transaction);
         accountsHistory.put(transaction.getOriginator(), listOfTransactionsOriginator);
-        ArrayList<Transaction> listOfTransactionsBeneficiary = accountsHistory.get(transaction.getBeneficiary());
+        List<Transaction> listOfTransactionsBeneficiary = accountsHistory.get(transaction.getBeneficiary());
         if (listOfTransactionsBeneficiary == null) {
             listOfTransactionsBeneficiary = new ArrayList<>();
         }

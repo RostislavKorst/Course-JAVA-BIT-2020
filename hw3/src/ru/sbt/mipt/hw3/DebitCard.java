@@ -108,12 +108,13 @@ public class DebitCard implements Account {
         transactionManager.rollbackTransaction(lastTransaction);
     }
 
+    @Override
     public double currentBalance() {
-        double toReturn = 0;
-        for (Entry entry : entries.betweenDates(LocalDateTime.MIN, LocalDateTime.MAX)) {
-            toReturn += entry.getAmount();
-        }
-        return toReturn;
+        return balanceOn(LocalDateTime.now());
+    }
+
+    public Entry lastEntry() {
+        return entries.last();
     }
 
     public Collection<Entry> history(LocalDateTime from, LocalDateTime to) throws IllegalArgumentException {
@@ -133,11 +134,11 @@ public class DebitCard implements Account {
      */
     @Override
     public double balanceOn(LocalDateTime date) {
-        double toReturn = 0;
-        for (Entry entry : entries.betweenDates(LocalDateTime.MIN, date)) {
-            toReturn += entry.getAmount();
+        double balance = 0;
+        for (Entry entry : entries.upTo(date)) {
+            balance += entry.getAmount();
         }
-        return toReturn;
+        return balance;
     }
 
     @Override

@@ -1,59 +1,52 @@
 package ru.sbt.mipt.hw3;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.Assert.*;
 
 public class TransactionTest {
-    //before
-    private final int bonusAccountPercent = 0;
+    private TransactionManager transactionManager;
+    private DebitCard account1;
+    private DebitCard account2;
+
+    @Before
+    public void createAccounts() {
+        transactionManager = new TransactionManager();
+        account1 = new DebitCard(transactionManager, 0);
+        account2 = new DebitCard(transactionManager, 0);
+    }
 
     @Test
-    public void execute_AddEntriesToTheHistory() {
+    public void execute_AddEntryToTheHistory() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard originator = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard beneficiary = new DebitCard(transactionManager, bonusAccountPercent);
         double amount = 2000;
-        Transaction transaction = new Transaction(amount, originator, beneficiary, false, false);
-        Transaction transactionTrueExecuted = new Transaction(amount, originator, beneficiary,
+        Transaction transaction = new Transaction(amount, account1, account2, false, false);
+        Transaction transactionTrueExecuted = new Transaction(amount, account1, account2,
                 true, false);
         //when
         transaction.execute();
-        Collection<Entry> originatorHistory = originator.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Collection<Entry> expectedOriginatorHistory = new ArrayList<>();
-        expectedOriginatorHistory.add(new Entry(originator, transactionTrueExecuted, -amount,
-                ((ArrayList<Entry>)originatorHistory).get(0).getTime()));
+        Entry expectedEntry = new Entry(account1, transactionTrueExecuted, -amount, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
         //then
-        assertEquals(expectedOriginatorHistory, originatorHistory);
+        assertEquals(expectedEntry, actualEntry);
     }
 
     @Test
     public void rollback_AddEntriesToTheHistory() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard originator = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard beneficiary = new DebitCard(transactionManager, bonusAccountPercent);
         double amount = 2000;
-        Transaction transaction = new Transaction(amount, originator, beneficiary, false, false);
-        Transaction transactionTrueExecuted = new Transaction(amount, originator, beneficiary,
-                true, false);
-        Transaction transactionTrueRolledBack = new Transaction(amount, originator, beneficiary,
+        Transaction transaction = new Transaction(amount, account1, account2, false, false);
+        Transaction transactionTrueRolledBack = new Transaction(amount, account1, account2,
                 true, true);
+        transactionManager.executeTransaction(transaction);
         //when
-        transaction.execute();
         transaction.rollback();
-        Collection<Entry> originatorHistory = originator.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Collection<Entry> expectedOriginatorHistory = new ArrayList<>();
-        expectedOriginatorHistory.add(new Entry(originator, transactionTrueExecuted, -amount,
-                ((ArrayList<Entry>)originatorHistory).get(0).getTime()));
-        expectedOriginatorHistory.add(new Entry(originator, transactionTrueRolledBack, amount,
-                ((ArrayList<Entry>)originatorHistory).get(1).getTime()));
+        Entry expectedEntry = new Entry(account1, transactionTrueRolledBack, amount, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
         //then
-        assertEquals(expectedOriginatorHistory, originatorHistory);
+        assertEquals(expectedEntry, actualEntry);
     }
 }

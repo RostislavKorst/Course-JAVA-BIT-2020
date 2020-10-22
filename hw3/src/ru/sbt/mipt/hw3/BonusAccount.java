@@ -27,10 +27,15 @@ public class BonusAccount implements Account {
      */
     @Override
     public double balanceOn(LocalDateTime date) {
-        double toReturn = 0;
-        for (Entry entry : entries.betweenDates(LocalDateTime.MIN, date)) {
-            toReturn += entry.getAmount();
+        double balance = 0;
+        for (Entry entry : entries.upTo(date)) {
+            balance += entry.getAmount();
         }
-        return toReturn;
+        return balance;
+    }
+
+    @Override
+    public double currentBalance() {
+        return balanceOn(LocalDateTime.now());
     }
 }

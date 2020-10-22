@@ -11,167 +11,147 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 public class DebitCardTest {
-    //before
-    private final int bonusAccountPercent = 0;
+
+    private DebitCard givenAccountWithInitialBalance(int initialBalance) {
+        TransactionManager transactionManager = new TransactionManager();
+        //before
+        int bonusAccountPercent = 0;
+        DebitCard account = new DebitCard(transactionManager, bonusAccountPercent);
+        if (initialBalance > 0) {
+            account.addCash(initialBalance);
+        }
+        return account;
+    }
 
     @Test
     public void withdraw_AddsEntryToTheHistory() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account1 = givenAccountWithInitialBalance(300);
+        DebitCard account2 = givenAccountWithInitialBalance(0);
         //when
-        Transaction expectedTransaction = new Transaction(200, debitCard1, debitCard2, true, false);
-        debitCard1.addCash(300);
-        debitCard1.withdraw(200, debitCard2);
-        Collection<Entry> originatorHistory = debitCard1.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Entry expectedEntry = new Entry(debitCard1, expectedTransaction, -200, ((ArrayList<Entry>)originatorHistory).get(1).getTime());
-        Entry actualEntry = ((ArrayList<Entry>) originatorHistory).get(1);
+        account1.withdraw(200, account2);
         //then
+        Entry expectedEntry = new Entry(account1, null, -200, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
         assertEquals(expectedEntry, actualEntry);
     }
 
     @Test
     public void withdraw_LowBalance_ReturnsFalse() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account1 = givenAccountWithInitialBalance(50);
+        DebitCard account2 = givenAccountWithInitialBalance(0);
         //when
-        boolean isNotCorrect = debitCard1.withdraw(200, debitCard2);
+        boolean isSuccessWithdraw = account1.withdraw(200, account2);
         //then
-        assertFalse(isNotCorrect);
+        assertFalse(isSuccessWithdraw);
     }
 
     @Test
-    public void withdrawCash() {
+    public void withdrawCash_AddsEntryToTheHistory() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account1 = givenAccountWithInitialBalance(300);
         //when
-        Transaction expectedTransaction = new Transaction(200, debitCard1, debitCard2, true, false);
-        debitCard1.addCash(300);
-        debitCard1.withdrawCash(200);
-        Collection<Entry> originatorHistory = debitCard1.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Entry expectedEntry = new Entry(debitCard1, expectedTransaction, -200, ((ArrayList<Entry>)originatorHistory).get(1).getTime());
-        Entry actualEntry = ((ArrayList<Entry>) originatorHistory).get(1);
+        account1.withdrawCash(200);
         //then
+        Entry expectedEntry = new Entry(account1, null, -200, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void addCash_AddsEntryToTheHistory() {
+        //given
+        DebitCard account1 = givenAccountWithInitialBalance(300);
+        //when
+        account1.addCash(200);
+        //then
+        Entry expectedEntry = new Entry(account1,null, 200, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void add_AddsEntryToTheHistory() {
+        //given
+        DebitCard account1 = givenAccountWithInitialBalance(300);
+        DebitCard account2 = givenAccountWithInitialBalance(200);
+        //when
+        account1.add(200, account2);
+        //then
+        Entry expectedEntry = new Entry(account1,null, 200, LocalDateTime.now());
+        Entry actualEntry = account1.lastEntry();
         assertEquals(expectedEntry, actualEntry);
     }
 
     @Test
     public void withdrawCash_LowBalance_ReturnsFalse() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account = givenAccountWithInitialBalance(50);
         //when
-        boolean isNotCorrect = debitCard1.withdrawCash(200);
+        boolean isSuccessWithdraw = account.withdrawCash(200);
         //then
-        assertFalse(isNotCorrect);
-    }
-
-    @Test
-    public void addCash() {
-        //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
-        //when
-        Transaction expectedTransaction = new Transaction(300, debitCard1, debitCard2, true, false);
-        debitCard1.addCash(300);
-        Collection<Entry> originatorHistory = debitCard1.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Entry expectedEntry = new Entry(debitCard1, expectedTransaction, 300, ((ArrayList<Entry>)originatorHistory).get(0).getTime());
-        Entry actualEntry = ((ArrayList<Entry>) originatorHistory).get(0);
-        //then
-        assertEquals(expectedEntry, actualEntry);
+        assertFalse(isSuccessWithdraw);
     }
 
     @Test
     public void addCash_NegativeAmount_ReturnsFalse() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account = givenAccountWithInitialBalance(0);
         //when
-        boolean isNotCorrect = debitCard1.addCash(-200);
+        boolean isSuccessAdd = account.addCash(-200);
         //then
-        assertFalse(isNotCorrect);
-    }
-
-    @Test
-    public void add() {
-        //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
-        //when
-        Transaction expectedTransaction = new Transaction(300, debitCard1, debitCard2, true, false);
-        debitCard1.add(300, debitCard2);
-        Collection<Entry> originatorHistory = debitCard1.history(LocalDateTime.MIN, LocalDateTime.MAX);
-        Entry expectedEntry = new Entry(debitCard1, expectedTransaction, 300, ((ArrayList<Entry>)originatorHistory).get(0).getTime());
-        Entry actualEntry = ((ArrayList<Entry>) originatorHistory).get(0);
-        //then
-        assertEquals(expectedEntry, actualEntry);
+        assertFalse(isSuccessAdd);
     }
 
     @Test
     public void add_NegativeAmount_ReturnsFalse() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account1 = givenAccountWithInitialBalance(200);
+        DebitCard account2 = givenAccountWithInitialBalance(300);
         //when
-        boolean isNotCorrect = debitCard1.add(-200, debitCard2);
+        boolean isSuccessAdd = account1.add(-200, account2);
         //then
-        assertFalse(isNotCorrect);
+        assertFalse(isSuccessAdd);
+    }
+
+    private void executeSomeTransactionsWithTimeDelay(DebitCard account) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.MILLISECONDS.sleep(10);
+        account.withdrawCash(45);
+        account.withdrawCash(50);
     }
 
     @Test
     public void balanceOn() throws InterruptedException {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account = givenAccountWithInitialBalance(500);
+        executeSomeTransactionsWithTimeDelay(account);
         //when
-        debitCard2.add(200, debitCard1);
-        debitCard2.addCash(300);
-        TimeUnit.SECONDS.sleep(2);
-        debitCard2.withdrawCash(45);
-        debitCard2.withdrawCash(50);
-        double actualBalance = debitCard2.balanceOn(LocalDateTime.now().minusSeconds(1));
+        double actualBalance = account.balanceOn(LocalDateTime.now().minusSeconds(1));
         //then
-        assertEquals(200 + 300, actualBalance, 0.0001);
+        assertEquals(500, actualBalance, 1e-4);
     }
 
     @Test
     public void rollbackLastTransaction_ReturnsBalanceWithoutRollBackedTransaction() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard debitCard1 = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard debitCard2 = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account = givenAccountWithInitialBalance(500);
         //when
-        debitCard2.add(200, debitCard1);
-        debitCard2.addCash(300);
-        debitCard2.withdrawCash(45);
-        debitCard2.withdrawCash(50);
-        debitCard2.rollbackLastTransaction();
-        double actualBalance = debitCard2.currentBalance();
+        account.withdrawCash(50);
+        account.rollbackLastTransaction();
+        double actualBalance = account.currentBalance();
         //then
-        assertEquals(200 + 300 - 45, actualBalance, 0.0001);
+        assertEquals(500, actualBalance, 1e-4);
     }
 
     @Test
     public void currentBalance() {
         //given
-        TransactionManager transactionManager = new TransactionManager();
-        DebitCard originator = new DebitCard(transactionManager, bonusAccountPercent);
-        DebitCard beneficiary = new DebitCard(transactionManager, bonusAccountPercent);
+        DebitCard account = givenAccountWithInitialBalance(500);
         //when
-        beneficiary.add(200, originator);
-        beneficiary.addCash(300);
-        beneficiary.withdrawCash(45);
-        double actualBalance = beneficiary.currentBalance();
+        double actualBalance = account.currentBalance();
         //then
-        assertEquals(200 + 300 - 45, actualBalance, 0.0001);
+        assertEquals(500, actualBalance, 1e-4);
     }
 }

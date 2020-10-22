@@ -3,7 +3,6 @@ package ru.sbt.mipt.hw3;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
