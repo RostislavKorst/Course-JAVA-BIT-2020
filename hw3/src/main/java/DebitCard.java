@@ -5,23 +5,14 @@ import java.util.Objects;
 public class DebitCard implements Account {
     private final long id;
     private final TransactionManager transactionManager;
-    private final Entries entries;
+    private final Entries entries = new Entries();
     private static long counter = 1;
-    private final double bonusAccountPercent;
     private final BonusAccount bonusAccount;
 
-    public DebitCard(TransactionManager transactionManager, int bonusAccountPercent) {
-        this.bonusAccountPercent = bonusAccountPercent;
+    public DebitCard(TransactionManager transactionManager, BonusAccount bonusAccount) {
         this.id = counter++;
         this.transactionManager = transactionManager;
-        this.entries = new Entries();
-        bonusAccount = new BonusAccount(bonusAccountPercent);
-    }
-
-    private void addPointsToBonusAccount(double amountOfTransaction, Transaction transaction) {
-        Entry entry =  new Entry(bonusAccount, transaction,
-                amountOfTransaction * bonusAccountPercent / 100., LocalDateTime.now());
-        bonusAccount.addEntry(entry);
+        this.bonusAccount = bonusAccount;
     }
 
     /**
@@ -139,13 +130,18 @@ public class DebitCard implements Account {
         return balance;
     }
 
+    private void addPointsToBonusAccount(double amountOfTransaction, Transaction transaction) {
+        Entry entry =  new Entry(bonusAccount, transaction,
+                amountOfTransaction * bonusAccount.getBonusPercent() / 100., LocalDateTime.now());
+        bonusAccount.addEntry(entry);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DebitCard debitCard = (DebitCard) o;
         return id == debitCard.id &&
-                Double.compare(debitCard.bonusAccountPercent, bonusAccountPercent) == 0 &&
                 Objects.equals(transactionManager, debitCard.transactionManager) &&
                 Objects.equals(entries, debitCard.entries) &&
                 Objects.equals(bonusAccount, debitCard.bonusAccount);
@@ -153,6 +149,6 @@ public class DebitCard implements Account {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, transactionManager, entries, bonusAccountPercent, bonusAccount);
+        return Objects.hash(id, transactionManager, entries, bonusAccount);
     }
 }

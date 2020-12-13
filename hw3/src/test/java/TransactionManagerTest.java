@@ -15,8 +15,9 @@ public class TransactionManagerTest {
     @Before
     public void createAccounts() {
         transactionManager = new TransactionManager();
-        account1 = new DebitCard(transactionManager, 0);
-        account2 = new DebitCard(transactionManager, 0);
+        BonusAccount bonusAccount = new BonusAccount(0);
+        account1 = new DebitCard(transactionManager, bonusAccount);
+        account2 = new DebitCard(transactionManager, bonusAccount);
     }
 
     @Test

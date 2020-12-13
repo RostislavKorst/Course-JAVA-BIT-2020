@@ -15,8 +15,9 @@ public class EntriesTest {
     @Before
     public void createEntries() {
         entries = new Entries();
-        DebitCard account = new DebitCard(new TransactionManager(), 0);
-        DebitCard account1 = new DebitCard(new TransactionManager(), 0);
+        BonusAccount bonusAccount = new BonusAccount(0);
+        DebitCard account = new DebitCard(new TransactionManager(), bonusAccount);
+        DebitCard account1 = new DebitCard(new TransactionManager(), bonusAccount);
         Entry firstEntry0minutes0seconds = new Entry(account, new Transaction(0, 0, account, account1,
                 false, false), 0,
                 LocalDateTime.now());

@@ -26,18 +26,19 @@ public class AnalyticsManagerTest {
         TransactionManager transactionManager = new TransactionManager();
         analyticsManager = new AnalyticsManager(transactionManager);
         int bonusAccountPercent = 0;
-        mainAccount = new DebitCard(transactionManager, 0);
-        beneficiary1 = new DebitCard(transactionManager, 0);
-        beneficiary2 = new DebitCard(transactionManager, 0);
-        beneficiary3 = new DebitCard(transactionManager, 0);
-        beneficiary4 = new DebitCard(transactionManager, 0);
-        originator1 = new DebitCard(transactionManager, 0);
-        debitCard1 = new DebitCard(transactionManager, 0);
-        debitCard2 = new DebitCard(transactionManager, 0);
-        debitCard3 = new DebitCard(transactionManager, 0);
-        debitCard4 = new DebitCard(transactionManager, 0);
-        debitCard5 = new DebitCard(transactionManager, 0);
-        debitCard6 = new DebitCard(transactionManager, 0);
+        BonusAccount bonusAccount = new BonusAccount(bonusAccountPercent);
+        mainAccount = new DebitCard(transactionManager, bonusAccount);
+        beneficiary1 = new DebitCard(transactionManager, bonusAccount);
+        beneficiary2 = new DebitCard(transactionManager, bonusAccount);
+        beneficiary3 = new DebitCard(transactionManager, bonusAccount);
+        beneficiary4 = new DebitCard(transactionManager, bonusAccount);
+        originator1 = new DebitCard(transactionManager, bonusAccount);
+        debitCard1 = new DebitCard(transactionManager, bonusAccount);
+        debitCard2 = new DebitCard(transactionManager, bonusAccount);
+        debitCard3 = new DebitCard(transactionManager, bonusAccount);
+        debitCard4 = new DebitCard(transactionManager, bonusAccount);
+        debitCard5 = new DebitCard(transactionManager, bonusAccount);
+        debitCard6 = new DebitCard(transactionManager, bonusAccount);
     }
 
     @Test

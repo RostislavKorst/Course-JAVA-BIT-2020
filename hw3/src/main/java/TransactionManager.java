@@ -35,8 +35,8 @@ public class TransactionManager {
     }
 
     public void rollbackTransaction(Transaction transaction) {
-        Transaction new_transaction = transaction.rollback();
-        addToAccountsHistory(new_transaction);
+        Transaction newTransaction = transaction.rollback();
+        addToAccountsHistory(newTransaction);
     }
 
     public void executeTransaction(Transaction transaction) {

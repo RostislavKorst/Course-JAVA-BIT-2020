@@ -3,13 +3,12 @@ import java.time.LocalDateTime;
 public class BonusAccount implements Account {
     private final int percent;
     private final long id;
-    private final Entries entries;
+    private final Entries entries = new Entries();
     private static long counter = 1;
 
     public BonusAccount(int percent) {
         this.percent = percent;
         this.id = counter++;
-        this.entries = new Entries();
     }
 
     @Override
@@ -35,5 +34,9 @@ public class BonusAccount implements Account {
     @Override
     public double currentBalance() {
         return balanceOn(LocalDateTime.now());
+    }
+
+    int getBonusPercent() {
+        return percent;
     }
 }

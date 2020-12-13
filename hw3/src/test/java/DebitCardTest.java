@@ -6,17 +6,6 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 public class DebitCardTest {
-    private DebitCard givenAccountWithInitialBalance(int initialBalance) {
-        TransactionManager transactionManager = new TransactionManager();
-        //before
-        int bonusAccountPercent = 0;
-        DebitCard account = new DebitCard(transactionManager, bonusAccountPercent);
-        if (initialBalance > 0) {
-            account.addCash(initialBalance);
-        }
-        return account;
-    }
-
     @Test
     public void withdraw_AddsEntryToTheHistory() {
         //given
@@ -147,5 +136,17 @@ public class DebitCardTest {
         TimeUnit.MILLISECONDS.sleep(10);
         account.withdrawCash(45);
         account.withdrawCash(50);
+    }
+
+    private DebitCard givenAccountWithInitialBalance(int initialBalance) {
+        TransactionManager transactionManager = new TransactionManager();
+        //before
+        int bonusAccountPercent = 0;
+        BonusAccount bonusAccount = new BonusAccount(bonusAccountPercent);
+        DebitCard account = new DebitCard(transactionManager, bonusAccount);
+        if (initialBalance > 0) {
+            account.addCash(initialBalance);
+        }
+        return account;
     }
 }
