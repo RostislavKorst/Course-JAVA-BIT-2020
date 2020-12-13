@@ -1,6 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.*;
@@ -19,9 +20,10 @@ public class TransactionTest {
     }
 
     @Test
-    public void execute_AddEntryToTheHistory() {
+    public void execute_AddEntryToTheHistory() throws NoSuchFieldException, IllegalAccessException {
         //given
         double amount = 2000;
+        startTransactionIdFromOne();
         Transaction transaction = new Transaction(amount, account1, account2, false, false);
         Transaction transactionTrueExecuted = new Transaction(amount, account1, account2,
                 true, false);
@@ -34,9 +36,10 @@ public class TransactionTest {
     }
 
     @Test
-    public void rollback_AddEntriesToTheHistory() {
+    public void rollback_AddEntriesToTheHistory() throws NoSuchFieldException, IllegalAccessException {
         //given
         double amount = 2000;
+        startTransactionIdFromOne();
         Transaction transaction = new Transaction(amount, account1, account2, false, false);
         Transaction transactionTrueRolledBack = new Transaction(amount, account1, account2,
                 true, true);
@@ -47,5 +50,13 @@ public class TransactionTest {
         Entry actualEntry = account1.lastEntry();
         //then
         assertEquals(expectedEntry, actualEntry);
+    }
+
+    private void startTransactionIdFromOne() throws NoSuchFieldException, IllegalAccessException {
+        Transaction transaction = new Transaction(0, 2000, account1, account2,
+                true, false);
+        Field field = Transaction.class.getDeclaredField("counter");
+        field.setAccessible(true);
+        field.setLong(transaction, 1);
     }
 }

@@ -1,6 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,8 +32,10 @@ public class TransactionManagerTest {
     }
 
     @Test
-    public void findAllTransactionsByAccount_ReturnsCollectionOfTransactions() {
+    public void findAllTransactionsByAccount_ReturnsCollectionOfTransactions() throws NoSuchFieldException,
+            IllegalAccessException {
         //given
+        startTransactionIdFromOne();
         executeSomeTransactions();
         Collection<Transaction> expectedListOfTransactions = getExpectedTransactions();
         //when
@@ -86,5 +89,13 @@ public class TransactionManagerTest {
         Transaction transaction3 = new Transaction(3, 45, account2, null,
                 true, false);
         return Arrays.asList(transaction1, transaction2, transaction3);
+    }
+
+    private void startTransactionIdFromOne() throws NoSuchFieldException, IllegalAccessException {
+        Transaction transaction = new Transaction(0, 2000, account1, account2,
+                true, false);
+        Field field = Transaction.class.getDeclaredField("counter");
+        field.setAccessible(true);
+        field.setLong(transaction, 1);
     }
 }

@@ -12,7 +12,7 @@ public class AnalyticsManager {
         this.transactionManager = transactionManager;
     }
 
-    public Account mostFrequentBeneficiaryOfAccount(DebitCard account) {
+    public Account mostFrequentBeneficiaryOfAccount(Account account) {
         Collection<Transaction> transactionsByAccount = transactionManager.findAllTransactionsByAccount(account);
         return transactionsByAccount.stream()
                 .map(Transaction::getBeneficiary)
@@ -24,7 +24,7 @@ public class AnalyticsManager {
                 .orElse(null);
     }
 
-    public Collection<Transaction> topTenExpensivePurchases(DebitCard account) {
+    public Collection<Transaction> topTenExpensivePurchases(Account account) {
         Collection<Transaction> transactionsByAccount = transactionManager.findAllPurchasesByAccount(account);
         return transactionsByAccount.stream()
                 .sorted(Comparator.comparingDouble(Transaction::getAmount).reversed())
@@ -55,7 +55,7 @@ public class AnalyticsManager {
                 .collect(toList());
     }
 
-    public Optional<Entry> maxExpenseAmountEntryWithinInterval(List<Account> accounts, LocalDateTime from,
+    public Optional<Entry> maxExpenseAmountEntryWithinInterval(List<? extends Account> accounts, LocalDateTime from,
                                                                LocalDateTime to) {
         return accounts.stream()
                 .filter(Objects::nonNull)

@@ -18,11 +18,11 @@ public class TransactionManager {
         return new Transaction(amount, originator, beneficiary, false, false);
     }
 
-    public Collection<Transaction> findAllTransactionsByAccount(DebitCard debitCard) {
+    public Collection<Transaction> findAllTransactionsByAccount(Account debitCard) {
         return accountsHistory.get(debitCard);
     }
 
-    Collection<Transaction> findAllPurchasesByAccount(DebitCard debitCard) {
+    Collection<Transaction> findAllPurchasesByAccount(Account debitCard) {
         //find all transactions where account was originator
         Collection<Transaction> allTransactionsByAccount = findAllTransactionsByAccount(debitCard);
         Collection<Transaction> allPurchases = new ArrayList<>();
