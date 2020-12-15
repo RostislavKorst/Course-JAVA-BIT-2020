@@ -16,7 +16,7 @@ public class ReportGeneratorCSVTest extends TestCase {
         Person alex = new Person("Alex", "Alexov", 170, 80, List.of(jack, julia));
         Person bob = new Person("Bob", "Bobov", 165, 80, List.of(alex));
         ReportGenerator<Person> reportGenerator = new ReportGeneratorCSV<>(Person.class);
-        FileOutputStream os = new FileOutputStream("reportPerson.csv");
+        FileOutputStream os = new FileOutputStream("report3.csv");
         reportGenerator.generate(List.of(alex, bob, jack, julia)).writeTo(os);
     }
 }

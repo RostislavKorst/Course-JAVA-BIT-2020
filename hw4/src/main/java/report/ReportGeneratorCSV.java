@@ -47,16 +47,20 @@ public class ReportGeneratorCSV<T> implements ReportGenerator<T> {
     }
 
     private void body(List<? extends T> entities, StringBuilder builder, List<Field> fields) {
-        for (T entity : entities) {
-            List<String> entityRow = new ArrayList<>();
-            for (Field field : fields) {
-                try {
-                    entityRow.add(field.get(entity).toString());
-                } catch (IllegalAccessException | NullPointerException ex) {
-                    entityRow.add("null");
-                }
+        entities.stream()
+                .map(entity -> constructEntityRow(fields, entity))
+                .forEach(row -> builder.append('\n').append(String.join(",", row)));
+    }
+
+    private List<String> constructEntityRow(List<Field> fields, T entity) {
+        List<String> entityRow = new ArrayList<>();
+        for (Field field : fields) {
+            try {
+                entityRow.add(field.get(entity).toString());
+            } catch (IllegalAccessException | NullPointerException ex) {
+                entityRow.add("null");
             }
-            builder.append('\n').append(String.join(",", entityRow));
         }
+        return entityRow;
     }
 }

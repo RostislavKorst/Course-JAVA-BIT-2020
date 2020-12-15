@@ -13,7 +13,7 @@ public class Main {
         DebitCard debitCard1 = new DebitCard(transactionManager, 15);
         DebitCard debitCard2 = new DebitCard(transactionManager, 25);
         ReportGenerator<DebitCard> reportGenerator = new ReportGeneratorCSV<>(DebitCard.class);
-        FileOutputStream os = new FileOutputStream("report1.csv");
+        FileOutputStream os = new FileOutputStream("report2.csv");
         reportGenerator.generate(List.of(debitCard1, debitCard2)).writeTo(os);
     }
 }
