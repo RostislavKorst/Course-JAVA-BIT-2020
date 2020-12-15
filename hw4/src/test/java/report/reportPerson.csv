@@ -1,0 +1,5 @@
+id,firstName,secondName,height,weight,children
+3,Alex,Alexov,170,80,[Person{id=1, firstName='Jack', secondName='Alexov', height=180, weight=80, children=null}, Person{id=2, firstName='Julia', secondName='Alexova', height=160, weight=55, children=null}]
+4,Bob,Bobov,165,80,[Person{id=3, firstName='Alex', secondName='Alexov', height=170, weight=80, children=[Person{id=1, firstName='Jack', secondName='Alexov', height=180, weight=80, children=null}, Person{id=2, firstName='Julia', secondName='Alexova', height=160, weight=55, children=null}]}]
+1,Jack,Alexov,180,80,null
+2,Julia,Alexova,160,55,null

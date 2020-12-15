@@ -1,0 +1,3 @@
+id,transactionManager,entries,bonusAccountPercent,bonusAccount
+1,resources.TransactionManager@30dae81,Entries{storage=[]},15.0,resources.BonusAccount@37a71e93
+2,resources.TransactionManager@30dae81,Entries{storage=[]},25.0,resources.BonusAccount@7e6cbb7a
